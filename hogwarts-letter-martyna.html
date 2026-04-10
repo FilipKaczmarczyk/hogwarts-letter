@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Wiadomość z Hogwartu">
+<meta property="og:description" content="Masz list...">
+<title>Wiadomość z Hogwartu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=MedievalSharp&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0a1a;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.25) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(30, 58, 138, 0.25) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(88, 28, 135, 0.15) 0%, transparent 50%);
+    font-family: 'IM Fell English', serif;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .star {
+    position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+    animation: twinkle ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { 0% { opacity: 0.15; transform: scale(0.8); } 100% { opacity: 0.9; transform: scale(1.2); } }
+
+  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; opacity: 0; transition: opacity 1.5s ease; }
+  .particles.active { opacity: 1; }
+  .particle {
+    position: absolute; width: 3px; height: 3px; background: rgba(255, 215, 0, 0.6);
+    border-radius: 50%; animation: float-up linear infinite; box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+  }
+  @keyframes float-up {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; } 90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  .envelope-wrapper { position: relative; z-index: 1; }
+
+  .owl-intro {
+    text-align: center; color: rgba(245, 230, 200, 0.7); font-style: italic;
+    font-size: clamp(14px, 3vw, 18px); margin-bottom: 30px; opacity: 0;
+    animation: fadeIn 1.5s ease 0.5s forwards; line-height: 1.6;
+  }
+  .owl-intro .owl-emoji { display: block; font-size: 40px; font-style: normal; margin-bottom: 12px; animation: owl-bob 3s ease-in-out infinite; }
+  @keyframes owl-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .envelope {
+    width: min(650px, 90vw); cursor: pointer; position: relative;
+    transition: transform 0.6s ease; opacity: 0; animation: fadeIn 1s ease 1.2s forwards;
+  }
+  .envelope:hover { transform: scale(1.02); }
+  .envelope.opened { pointer-events: none; }
+
+  .envelope-body {
+    background: linear-gradient(145deg, #8B4513, #A0522D, #8B4513);
+    border-radius: 8px; padding: 55px 40px 40px; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.1), inset 0 -3px 8px rgba(0,0,0,0.2);
+    min-height: 190px; display: flex; align-items: center; justify-content: center; flex-direction: column;
+    transition: opacity 0.8s ease;
+  }
+  .envelope-body::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px);
+    border-radius: 8px; pointer-events: none;
+  }
+
+  .envelope-flap {
+    width: 100%; height: 0;
+    border-left: min(325px, 45vw) solid transparent;
+    border-right: min(325px, 45vw) solid transparent;
+    border-top: 110px solid #7a3b10;
+    position: relative; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    transform-origin: top center; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2;
+  }
+  .envelope.opened .envelope-flap { transform: rotateX(180deg); }
+
+  .wax-seal {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    width: 66px; height: 66px;
+    background: radial-gradient(circle at 35% 35%, #dc2626, #991b1b, #7f1d1d);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3);
+    z-index: 3; font-family: 'Cinzel Decorative', serif; color: rgba(255,255,255,0.9);
+    font-size: 26px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+  .wax-seal::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; opacity: 0;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,200,50,0.8) 50%, transparent 60%),
+      linear-gradient(-30deg, transparent 35%, rgba(255,200,50,0.6) 50%, transparent 65%);
+    transition: opacity 0.3s ease;
+  }
+  .envelope.opened .wax-seal::after { opacity: 1; }
+  .envelope.opened .wax-seal {
+    transform: translateX(-50%) scale(1.3); opacity: 0;
+    transition: transform 0.6s ease, opacity 0.4s ease 0.3s;
+  }
+
+  .envelope-address { color: #f5e6c8; text-align: center; font-family: 'IM Fell English', serif; transition: opacity 0.5s ease; position: relative; z-index: 1; }
+  .envelope-address .name { font-size: clamp(22px, 4vw, 30px); font-family: 'Cinzel', serif; font-weight: 700; color: #f0d68a; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-bottom: 6px; }
+  .envelope-address .detail { font-size: clamp(12px, 2.5vw, 16px); font-style: italic; opacity: 0.8; line-height: 1.6; }
+  .envelope.opened .envelope-address { opacity: 0; }
+
+  .click-hint { margin-top: 14px; font-size: 13px; color: rgba(245, 230, 200, 0.5); font-style: italic; animation: pulse-hint 2s ease-in-out infinite; position: relative; z-index: 1; }
+  .envelope.opened .click-hint { opacity: 0; }
+  @keyframes pulse-hint { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+
+  .letter-container {
+    position: absolute; top: 0; left: 50%; width: min(650px, 90vw);
+    opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(50px);
+    transition: opacity 0.8s ease 0.5s, transform 0.8s cubic-bezier(0.2, 0, 0.2, 1) 0.5s;
+  }
+  .letter-container.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+  .letter {
+    background: linear-gradient(170deg, #faf3e0 0%, #f5ecd4 40%, #efe0c4 100%);
+    border-radius: 4px; padding: clamp(28px, 6vw, 55px); position: relative;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(139, 69, 19, 0.15), inset 0 0 80px rgba(139, 69, 19, 0.04);
+    overflow: hidden;
+  }
+  .letter::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"); pointer-events: none; }
+  .letter::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 0% 0%, rgba(139,69,19,0.08) 0%, transparent 40%), radial-gradient(ellipse at 100% 100%, rgba(139,69,19,0.1) 0%, transparent 40%), radial-gradient(ellipse at 100% 0%, rgba(139,69,19,0.05) 0%, transparent 30%); pointer-events: none; }
+
+  .letter-border { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid rgba(139, 69, 19, 0.15); border-radius: 2px; pointer-events: none; }
+  .letter-border::before { content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid rgba(139, 69, 19, 0.08); }
+
+  .hogwarts-crest { text-align: center; margin-bottom: 20px; position: relative; z-index: 1; }
+  .crest-shield { display: inline-block; width: 75px; height: 90px; }
+  .crest-shield svg { width: 100%; height: 100%; }
+  .crest-text { font-family: 'Cinzel Decorative', serif; font-size: clamp(17px, 3.5vw, 24px); font-weight: 700; color: #5c3317; letter-spacing: 4px; text-transform: uppercase; margin-top: 6px; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+  .crest-subtitle { font-family: 'Cinzel', serif; font-size: clamp(8px, 1.8vw, 11px); color: #8B6914; letter-spacing: 5px; text-transform: uppercase; margin-top: 3px; }
+
+  .divider { width: 55%; height: 1px; background: linear-gradient(to right, transparent, #8B6914, transparent); margin: 18px auto; }
+  .headmaster-line { text-align: center; font-size: clamp(10px, 2vw, 12px); color: #8B6914; font-style: italic; margin-bottom: 18px; letter-spacing: 1px; }
+
+  .letter-content { position: relative; z-index: 1; color: #3a2a1a; font-size: clamp(14px, 2.8vw, 17px); line-height: 1.85; }
+  .letter-content .salutation { font-family: 'Cinzel', serif; font-size: clamp(15px, 3vw, 20px); font-weight: 700; color: #5c3317; margin-bottom: 14px; }
+  .letter-content p { margin-bottom: 12px; text-align: justify; text-indent: 1.5em; }
+  .letter-content p:first-of-type { text-indent: 0; }
+  .highlight { color: #8B0000; font-weight: bold; font-family: 'Cinzel', serif; font-size: 0.95em; }
+  .gold { color: #8B6914; font-weight: bold; }
+
+  .ticket-details { background: rgba(139, 69, 19, 0.05); border: 1px solid rgba(139, 69, 19, 0.12); border-radius: 6px; padding: 18px 22px; margin: 22px 0; position: relative; }
+  .ticket-details::before { content: '⚡'; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: linear-gradient(170deg, #f8f0dd, #f2e8d0); padding: 0 12px; font-size: 16px; }
+  .ticket-details .detail-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px dotted rgba(139, 69, 19, 0.12); flex-wrap: wrap; gap: 4px; }
+  .ticket-details .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-family: 'Cinzel', serif; font-size: clamp(10px, 1.8vw, 13px); color: #8B6914; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
+  .detail-value { font-size: clamp(13px, 2.5vw, 16px); color: #3a2a1a; text-align: right; }
+
+  .signature-area { margin-top: 26px; text-align: right; padding-right: 16px; }
+  .signature-area .closing { font-style: italic; color: #5c3317; margin-bottom: 4px; font-size: 0.95em; }
+  .signature-name { font-family: 'MedievalSharp', cursive; font-size: clamp(20px, 4vw, 28px); color: #3a1a0a; transform: rotate(-3deg); display: inline-block; }
+  .signature-title { font-size: clamp(9px, 1.8vw, 12px); color: #8B6914; font-style: italic; margin-top: 3px; }
+  .footer-motto { text-align: center; margin-top: 28px; font-family: 'Cinzel', serif; font-size: clamp(9px, 1.8vw, 12px); color: #8B6914; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; }
+
+  .letter-content > * { opacity: 0; transform: translateY(12px); }
+  .letter-container.visible .letter-content > * { animation: fadeInUp 0.5s ease forwards; }
+  .letter-container.visible .letter-content > *:nth-child(1) { animation-delay: 0.7s; }
+  .letter-container.visible .letter-content > *:nth-child(2) { animation-delay: 0.9s; }
+  .letter-container.visible .letter-content > *:nth-child(3) { animation-delay: 1.1s; }
+  .letter-container.visible .letter-content > *:nth-child(4) { animation-delay: 1.3s; }
+  .letter-container.visible .letter-content > *:nth-child(5) { animation-delay: 1.5s; }
+  .letter-container.visible .letter-content > *:nth-child(6) { animation-delay: 1.7s; }
+  .letter-container.visible .letter-content > *:nth-child(7) { animation-delay: 1.9s; }
+  .letter-container.visible .letter-content > *:nth-child(8) { animation-delay: 2.1s; }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+  .hogwarts-crest, .divider, .headmaster-line { opacity: 0; }
+  .letter-container.visible .hogwarts-crest { animation: fadeInUp 0.6s ease 0.2s forwards; }
+  .letter-container.visible .divider { animation: fadeInUp 0.4s ease 0.4s forwards; }
+  .letter-container.visible .headmaster-line { animation: fadeInUp 0.4s ease 0.5s forwards; }
+
+  .seal-flash { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(255,215,0,0.3), transparent 70%); pointer-events: none; z-index: 10; opacity: 0; transition: opacity 0.15s ease; }
+  .seal-flash.active { opacity: 1; transition: opacity 0.05s ease; }
+
+  @media print {
+    body { background: white !important; padding: 0; }
+    .stars, .particles, .seal-flash, .owl-intro, .envelope { display: none !important; }
+    .letter-container { position: static !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    .letter { box-shadow: none; }
+    .letter-content > *, .hogwarts-crest, .divider, .headmaster-line { opacity: 1 !important; transform: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="particles" id="particles"></div>
+<div class="seal-flash" id="sealFlash"></div>
+
+<div class="envelope-wrapper">
+  <div class="owl-intro">
+    <span class="owl-emoji">🦉</span>
+    Sowa dostarczyła przesyłkę...
+  </div>
+
+  <div class="envelope" id="envelope" onclick="openEnvelope()">
+    <div class="envelope-flap">
+      <div class="wax-seal">H</div>
+    </div>
+    <div class="envelope-body">
+      <div class="envelope-address">
+        <div class="name">Panna Martyna</div>
+        <div class="detail">Obecne miejsce zamieszkania<br>Polska</div>
+      </div>
+      <div class="click-hint">Dotknij pieczęć, aby otworzyć...</div>
+    </div>
+  </div>
+
+  <div class="letter-container" id="letter">
+    <div class="letter">
+      <div class="letter-border"></div>
+      <div class="hogwarts-crest">
+        <svg class="crest-shield" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#8B6914" />
+              <stop offset="50%" style="stop-color:#DAA520" />
+              <stop offset="100%" style="stop-color:#8B6914" />
+            </linearGradient>
+          </defs>
+          <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="url(#shieldGrad)" stroke-width="3"/>
+          <path d="M50 15 L80 30 L80 68 Q80 92 50 105 Q20 92 20 68 L20 30 Z" fill="none" stroke="url(#shieldGrad)" stroke-width="1" opacity="0.5"/>
+          <line x1="50" y1="15" x2="50" y2="105" stroke="url(#shieldGrad)" stroke-width="1" opacity="0.4"/>
+          <line x1="20" y1="58" x2="80" y2="58" stroke="url(#shieldGrad)" stroke-width="1" opacity="0.4"/>
+          <text x="35" y="48" font-size="18" opacity="0.7">🦁</text>
+          <text x="55" y="48" font-size="18" opacity="0.7">🦅</text>
+          <text x="35" y="82" font-size="18" opacity="0.7">🦡</text>
+          <text x="55" y="82" font-size="18" opacity="0.7">🐍</text>
+          <text x="50" y="67" font-family="'Cinzel Decorative', serif" font-size="14" font-weight="bold" fill="#8B6914" text-anchor="middle">H</text>
+        </svg>
+        <div class="crest-text">Hogwart</div>
+        <div class="crest-subtitle">Szkoła Magii i Czarodziejstwa</div>
+      </div>
+      <div class="divider"></div>
+      <div class="headmaster-line">Dyrektor: Albus Dumbledore</div>
+      <div class="letter-content">
+        <div class="salutation">Droga Panno Martyno,</div>
+        <p>
+          Mamy przyjemność poinformować, że została Pani przyjęta na specjalną
+          wycieczkę edukacyjną do <span class="highlight">Studia Filmowego Warner Bros.</span>
+          w Londynie, gdzie będzie Pani mogła zobaczyć na własne oczy miejsca,
+          w których powstawała magia świata czarodziejów.
+        </p>
+        <p>
+          Ministerstwo Magii, we współpracy z Mugolskim Departamentem Transportu,
+          zapewniło Pani bezpieczny przejazd ekspresowym pociągiem
+          ze stacji <span class="gold">Manchester Piccadilly</span> na stację
+          <span class="gold">London Euston</span>. Poniżej szczegóły podróży.
+        </p>
+        <div class="ticket-details">
+          <div class="detail-row">
+            <span class="detail-label">Data podróży</span>
+            <span class="detail-value">Poniedziałek, 20 kwietnia 2026</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Odjazd</span>
+            <span class="detail-value">Manchester Piccadilly — 09:14</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Przyjazd</span>
+            <span class="detail-value">London Euston — 11:27</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Studio Tour</span>
+            <span class="detail-value">Wejście o godzinie 13:00</span>
+          </div>
+        </div>
+        <p>
+          Prosimy o punktualne stawienie się na peronie. Różdżki, miotły
+          i inne magiczne przedmioty prosimy schować do bagażu podręcznego,
+          aby nie niepokoić mugolskich współpasażerów.
+        </p>
+        <p>Życzymy magicznej podróży!</p>
+        <div class="signature-area">
+          <div class="closing">Z wyrazami szacunku,</div>
+          <div class="signature-name">Albus Dumbledore</div>
+          <div class="signature-title">Dyrektor Szkoły Magii i Czarodziejstwa Hogwart</div>
+        </div>
+        <div class="footer-motto">Draco Dormiens Nunquam Titillandus</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDuration = (1.5+Math.random()*3)+'s';
+    s.style.animationDelay = Math.random()*4+'s';
+    const sz = (1+Math.random()*2)+'px';
+    s.style.width = sz; s.style.height = sz;
+    starsEl.appendChild(s);
+  }
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random()*100+'%';
+    p.style.animationDuration = (7+Math.random()*10)+'s';
+    p.style.animationDelay = Math.random()*6+'s';
+    const sz = (2+Math.random()*3)+'px';
+    p.style.width = sz; p.style.height = sz;
+    particlesEl.appendChild(p);
+  }
+  function openEnvelope() {
+    const envelope = document.getElementById('envelope');
+    const letter = document.getElementById('letter');
+    const flash = document.getElementById('sealFlash');
+    const owl = document.querySelector('.owl-intro');
+    if (envelope.classList.contains('opened')) return;
+    envelope.classList.add('opened');
+    flash.classList.add('active');
+    setTimeout(() => flash.classList.remove('active'), 300);
+    setTimeout(() => particlesEl.classList.add('active'), 500);
+    owl.style.opacity = '0'; owl.style.transition = 'opacity 0.5s ease';
+    setTimeout(() => {
+      envelope.style.opacity = '0';
+      envelope.style.transform = 'translateY(-30px) scale(0.95)';
+      envelope.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    }, 700);
+    setTimeout(() => {
+      envelope.style.display = 'none';
+      owl.style.display = 'none';
+      letter.classList.add('visible');
+    }, 1300);
+  }
+</script>
+</body>
+</html>
